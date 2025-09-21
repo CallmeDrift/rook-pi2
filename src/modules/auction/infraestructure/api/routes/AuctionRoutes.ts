@@ -4,14 +4,38 @@ import { AuctionController } from "../controllers/AuctionController";
 const router = Router();
 
 export default function auctionRoutes(auctionController: AuctionController) {
+  // Crear subasta
   router.post("/", auctionController.createAuction);
+
+  // Listar subastas abiertas
   router.get("/", auctionController.listAuctions);
-  router.post("/:id/bid", auctionController.placeBid);
-  router.post("/:id/buy", auctionController.buyNow);
-  router.get("/:id/bids", auctionController.getBids);
-  router.get("/me", auctionController.getCurrentUser);
+
+  // Obtener subasta por id
   router.get("/:id", auctionController.getAuction);
-  router.get("/history/purchased/:userId", auctionController.getPurchasedAuctions);
-  router.get("/history/sold/:userId", auctionController.getSoldAuctions);
+
+  // Pujar en subasta
+  router.post("/:id/bid", auctionController.placeBid);
+
+  // Compra rápida
+  router.post("/:id/buy", auctionController.buyNow);
+
+  // Obtener pujas de una subasta
+  router.get("/:id/bids", auctionController.getBids);
+
+  // Obtener usuario actual
+  router.get("/me/:username", auctionController.getCurrentUser);
+
+  // Subastas compradas por usuario
+  router.get(
+  "/history/sold/:username",
+  auctionController.getSoldHistory.bind(auctionController)
+);
+
+  // Subastas vendidas por usuario
+  router.get(
+  "/history/purchased/:username",
+  auctionController.getPurchasedHistory.bind(auctionController)
+);
+
   return router;
 }

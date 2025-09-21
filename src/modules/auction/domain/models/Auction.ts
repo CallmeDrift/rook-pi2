@@ -61,14 +61,16 @@ export class Auction implements NullObject{
 
   // Lógica de negocio
   placeBid(bid: Bid): boolean {
-    if (this.status !== "OPEN") return false;
-    if (bid.amount < this.currentPrice) return false;
+  if (this.status !== "OPEN") return false;
+  if (bid.amount < this.currentPrice) return false;
+  if (!bid.userId) throw new Error("Bid debe tener un userId válido");
 
-    this.currentPrice = bid.amount;
-    this.bids.push(bid);
-    this.highestBidderId = bid.userId;
-    return true;
-  }
+  this.currentPrice = bid.amount;
+  this.bids.push(bid);
+  this.highestBidderId = bid.userId;
+  return true;
+}
+
 
   closeAsExpired(): void { this.status = "EXPIRED"; }
 

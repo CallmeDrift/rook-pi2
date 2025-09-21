@@ -12,15 +12,15 @@ export const ITEM_TYPES = [
 export type ItemType = typeof ITEM_TYPES[number];
 
 export const HERO_TYPES = [
-  "Guerrero Tanque",
-  "Guerrero Armas",
-  "Mago Fuego",
-  "Mago Hielo",
-  "Pícaro Veneno",
-  "Pícaro Machete",
-  "Chamán",
-  "Médico",
-  "UNKNOWN"
+  'TANK',
+  'WEAPONS_PAL',
+  'FIRE_MAGE',
+  'ICE_MAGE',
+  'POISON_ROGUE',
+  'SHAMAN',
+  'MEDIC',
+  'MACHETE',
+  'UNKNOWN'
 ] as const;
 export type HeroType = typeof HERO_TYPES[number];
 

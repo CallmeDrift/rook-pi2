@@ -1,6 +1,5 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
-import jwt from "jsonwebtoken";
 import { IAuctionService } from "../../domain/services/IAuctionService";
 import { AuctionMapper } from "../../application/mappers/AuctionMapper";
 import { env } from "../config/env";
@@ -13,22 +12,8 @@ export function initAuctionSocket(server: HttpServer) {
     cors: { origin: env.corsOrigin, methods: ["GET", "POST"] },
   });
 
-  // Middleware de autenticación
-  io.use((socket, next) => {
-    const token = socket.handshake.auth?.["token"];
-    if (!token) return next(new Error("Token requerido"));
-
-    try {
-      const payload: any = jwt.verify(token, env.jwt.secret);
-      socket.data.userId = payload.userId;
-      next();
-    } catch {
-      next(new Error("Token inválido"));
-    }
-  });
-
   io.on("connection", (socket: Socket) => {
-    console.log(`[SOCKET] Cliente conectado: ${socket.id} (userId: ${socket.data.userId})`);
+    console.log(`[SOCKET] Cliente conectado: ${socket.id}`);
 
     // ---------------------------
     // Crear subasta
@@ -37,14 +22,11 @@ export function initAuctionSocket(server: HttpServer) {
       try {
         if (!auctionService) throw new Error("AuctionService no configurado");
 
-        const result = await auctionService.createAuction(
-          { ...data, ownerId: socket.data.userId },
-          data.token
-        );
+        const result = await auctionService.createAuction(data, data.username);
 
         const roomName = `auction-${result.auction.id}`;
         socket.join(roomName);
-        console.log(`[SOCKET] Usuario ${socket.data.userId} se unió a la sala ${roomName}`);
+        console.log(`[SOCKET] Usuario ${data.username} se unió a la sala ${roomName}`);
 
         emitNewAuction(result.auction);
         callback?.({ success: true, auction: result.auction });
@@ -60,7 +42,7 @@ export function initAuctionSocket(server: HttpServer) {
       try {
         if (!auctionService) throw new Error("AuctionService no configurado");
 
-        const success = await auctionService.placeBid(data.auctionId, data.token, data.amount);
+        const success = await auctionService.placeBid(data.auctionId, data.username, data.amount);
         callback?.({ success });
 
         if (success) {
@@ -72,7 +54,7 @@ export function initAuctionSocket(server: HttpServer) {
           emitTransactionCreated({
             type: "BID",
             auctionId: data.auctionId,
-            userId: socket.data.userId,
+            username: data.username,
             amount: data.amount,
           });
         }
@@ -88,7 +70,7 @@ export function initAuctionSocket(server: HttpServer) {
       try {
         if (!auctionService) throw new Error("AuctionService no configurado");
 
-        const success = await auctionService.buyNow(data.auctionId, data.token);
+        const success = await auctionService.buyNow(data.auctionId, data.username);
         callback?.({ success });
 
         if (success) {
@@ -100,7 +82,7 @@ export function initAuctionSocket(server: HttpServer) {
           emitTransactionCreated({
             type: "BUY_NOW",
             auctionId: data.auctionId,
-            userId: socket.data.userId,
+            username: data.username,
             amount: auction?.getBuyNowPrice(),
           });
         }

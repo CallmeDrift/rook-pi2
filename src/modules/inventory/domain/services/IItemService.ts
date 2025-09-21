@@ -1,15 +1,13 @@
-// src/inventory/domain/services/ItemService.ts
+// src/inventory/domain/services/IItemService.ts
 import { Item } from "../models/Item";
 
 export interface IItemService {
-  getAllItems(): Promise<Item[]>;
+  // Obtener todos los items de un usuario específico
+  getAllItemsByUsername(username: string): Promise<Item[]>;
 
-  getItemById(id: string): Promise<Item | null>;
+  // Obtener un item específico de un usuario
+  getItemById(username: string, itemId: string): Promise<Item | null>;
 
-  getItemsByUserId(userId: string): Promise<Item[]>;
-
-
-  getItemById(id: string): Promise<Item | null>;
-
-  getItemsByUserId(userId: string): Promise<Item[]>;
+  // Obtener todos los items de un usuario (alternativa)
+  getItemsByUsername(username: string): Promise<Item[]>;
 }

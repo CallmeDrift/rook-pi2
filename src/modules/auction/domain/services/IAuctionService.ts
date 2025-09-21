@@ -4,13 +4,28 @@ import { CreateAuctionInputDTO, CreateAuctionOutputDto } from "../../application
 import { User } from "../../../user/domain/models/User";
 
 export interface IAuctionService {
-  createAuction(input: CreateAuctionInputDTO, token: string): Promise<CreateAuctionOutputDto>;
-  placeBid(auctionId: string, token: string, amount: number): Promise<boolean>;
-  buyNow(auctionId: string, token: string): Promise<boolean>;
+  // Crear subasta usando username del vendedor
+  createAuction(input: CreateAuctionInputDTO, username: string): Promise<CreateAuctionOutputDto>;
+
+  // Pujar en subasta usando username del jugador
+  placeBid(auctionId: string, username: string, amount: number): Promise<boolean>;
+
+  // Compra rápida usando username
+  buyNow(auctionId: string, username: string): Promise<boolean>;
+
+  // Obtener subasta por ID
   getAuctionById(id: string): Promise<Auction | null>;
+
+  // Listar subastas abiertas
   listOpenAuctions(): Promise<Auction[] | null>;
-  getCurrentUser(token: string): Promise<User | null>; 
+
+  // Obtener usuario actual por username
+  getCurrentUser(username: string): Promise<User | null>;
+
+  // Finalizar subasta
   finalizeAuction(auctionId: string, winnerId?: string): Promise<void>;
-  getPurchasedAuctions(userId: string): Promise<Auction[]>;
-  getSoldAuctions(userId: string): Promise<Auction[]>;
+
+  // Historial de subastas compradas/vendidas
+  getPurchasedAuctions(username: string): Promise<Auction[]>;
+  getSoldAuctions(username: string): Promise<Auction[]>;
 }

@@ -3,32 +3,28 @@ import { UserRepository } from "./UserRepository";
 import axios from "axios";
 
 /**
- * Implementación HTTP de UserRepository
+ * Implementación HTTP de UserRepository que devuelve instancias de User
  */
 export class HttpUserRepository implements UserRepository {
   constructor(private readonly baseUrl: string) {}
 
   async findById(id: string): Promise<User | null> {
     try {
-      const res = await fetch(`${this.baseUrl}/users/${id}`);
+      const res = await fetch(`${this.baseUrl}/usuarios/${id}`);
       if (!res.ok) return null;
       const data = await res.json();
-      return new User(data.id, data.username, data.credits);
+      return new User(data._id, data.nombreUsuario, data.creditos);
     } catch {
       return null;
     }
   }
 
-  async updateCredits(id: string, credits: number): Promise<User | null> {
+  async findByUsername(username: string): Promise<User | null> {
     try {
-      const res = await fetch(`${this.baseUrl}/users/${id}/credits`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credits }),
-      });
+      const res = await fetch(`${this.baseUrl}/usuarios/${encodeURIComponent(username)}`);
       if (!res.ok) return null;
       const data = await res.json();
-      return new User(data.id, data.username, data.credits);
+      return new User(data._id, data.nombreUsuario, data.creditos);
     } catch {
       return null;
     }
@@ -39,9 +35,8 @@ export class HttpUserRepository implements UserRepository {
       const res = await axios.get(`${this.baseUrl}/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.data) return null;
       const data = res.data;
-      return new User(data.id, data.username, data.credits);
+      return data ? new User(data._id, data.nombreUsuario, data.creditos) : null;
     } catch {
       return null;
     }
@@ -49,14 +44,29 @@ export class HttpUserRepository implements UserRepository {
 
   async findAll(): Promise<User[]> {
     try {
-      const res = await fetch(`${this.baseUrl}/users`);
+      const res = await fetch(`${this.baseUrl}/usuarios`);
       if (!res.ok) return [];
       const data = await res.json();
-      return data.map(
-        (u: any) => new User(u.id, u.username, u.credits)
-      );
+      return data.map((u: any) => new User(u._id, u.nombreUsuario, u.creditos));
     } catch {
       return [];
     }
   }
+
+  async updateCredits(username: string, credits: number): Promise<User | null> {
+  try {
+    const res = await fetch(`${this.baseUrl}/usuarios/${encodeURIComponent(username)}/creditos`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credits }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return new User(data._id, data.nombreUsuario, data.creditos);
+  } catch {
+    return null;
+  }
+}
+
+
 }

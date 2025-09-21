@@ -1,11 +1,15 @@
-// src/routes/itemsRoutes.ts
+// src/interfaces/http/routes/ItemRoutes.ts
 import { Router } from "express";
 import { ItemController } from "../controllers/ItemController";
 
-const router = Router();
+export default (controller: ItemController) => {
+  const router = Router();
 
-export default function itemRoutes(itemController: ItemController) {
-  router.get("/", itemController.listItems);
-  router.get("/:id", itemController.getItem);
+  // Obtener un item específico
+  router.get("/:username/:id", controller.getItem);
+
+  // Listar todos los items de un usuario
+  router.get("/:username", controller.listItems);
+
   return router;
-}
+};

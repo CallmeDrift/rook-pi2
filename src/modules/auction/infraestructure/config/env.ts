@@ -8,10 +8,10 @@ export const env = {
   port: process.env["PORT"] ?? "3000",
   apiPrefix: process.env["API_PREFIX"] ?? "/api",
 
-  userServiceUrl: process.env["USER_SERVICE_URL"] ?? "http://localhost:4000",
-  itemServiceUrl: process.env["ITEM_SERVICE_URL"] ?? "http://localhost:3002",
+  userServiceUrl: process.env["USER_SERVICE_URL"] ?? "http://localhost:1882",
+  itemServiceUrl: process.env["ITEM_SERVICE_URL"] ?? "http://localhost:1882",
 
-  corsOrigin: process.env["CORS_ORIGIN"]?.split(",") ?? ["http://localhost:5173"],
+  corsOrigin: process.env["CORS_ORIGIN"]?.split(",") ?? ["http://localhost:4200"],
 
   db: {
     host: process.env["DB_HOST"] ?? "localhost",
